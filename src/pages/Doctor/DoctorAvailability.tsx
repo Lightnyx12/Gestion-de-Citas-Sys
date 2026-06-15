@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { availabilityService } from '../../lib/availability-service'
-import type { WeeklyAvailability, RecurrentPause, AgendaBlock } from '../../lib/availability-service'
-import { Calendar, Clock, Trash2, Plus, Check, Globe, Coffee, Loader2, AlertCircle } from 'lucide-react'
+import type { WeeklyAvailability, AgendaBlock } from '../../lib/availability-service'
+import { Calendar, Clock, Trash2, Plus, Check, Globe, Loader2, AlertCircle } from 'lucide-react'
 
 // Nombres de días de la semana
 const DAYS_OF_WEEK = [
@@ -21,7 +21,6 @@ export default function DoctorAvailability() {
   
   // Estados de datos
   const [weekly, setWeekly] = useState<WeeklyAvailability[]>([])
-  const [_pauses, setPauses] = useState<RecurrentPause[]>([])
   const [blocks, setBlocks] = useState<AgendaBlock[]>([])
   
   // Estado UI
@@ -64,11 +63,6 @@ const closeModal = () => {
   const [blockEnd, setBlockEnd] = useState('')
   const [blockDesc, setBlockDesc] = useState('')
 
-  // Edición de Almuerzo/Pausas (soporta una pausa por defecto, ej: Almuerzo)
-  const [lunchStart, setLunchStart] = useState('13:00')
-  const [lunchEnd, setLunchEnd] = useState('14:00')
-  const [isEditingLunch, setIsEditingLunch] = useState(false)
-
   // 1. Cargar datos del doctor al montar
   useEffect(() => {
     if (!user?.id) return
@@ -89,24 +83,8 @@ const closeModal = () => {
         setWeekly(config.weekly)
         setBlocks(config.blocks)
         
-        // Si tiene pausas, cargamos la primera (Almuerzo) o ponemos por defecto
-        if (config.pauses.length > 0) {
-          setPauses(config.pauses)
-          const lunch = config.pauses.find(p => p.nombre.toLowerCase().includes('almuerzo'))
-          if (lunch) {
-            setLunchStart(lunch.hora_inicio.substring(0, 5))
-            setLunchEnd(lunch.hora_fin.substring(0, 5))
-          }
-        } else {
-          // Pausa por defecto
-          setPauses([{
-            doctor_id: docId,
-            nombre: 'Almuerzo Diario',
-            hora_inicio: '13:00:00',
-            hora_fin: '14:00:00'
-          }])
-        }
-      } catch (err: any) {
+
+      } catch (err: unknown) {
         console.error(err)
         setMessage({ text: 'Error al cargar la configuración.', type: 'error' })
       } finally {
@@ -117,15 +95,7 @@ const closeModal = () => {
     loadData()
   }, [user])
 
-  // Helpers para convertir hora militar 24h a formato 12h para la vista
-  const formatTime12h = (time24: string) => {
-    if (!time24) return ''
-    const [hoursStr, minutesStr] = time24.split(':')
-    const hours = parseInt(hoursStr)
-    const ampm = hours >= 12 ? 'PM' : 'AM'
-    const hours12 = hours % 12 || 12
-    return `${String(hours12).padStart(2, '0')}:${minutesStr} ${ampm}`
-  }
+
 
   // Activar/desactivar un día
   const handleToggleDay = (dayId: number) => {
@@ -207,20 +177,22 @@ const closeModal = () => {
         return
       }
 
-      // Preparar la pausa (Almuerzo)
-      const lunchPause = {
-        nombre: 'Almuerzo Diario',
-        hora_inicio: `${lunchStart}:00`,
-        hora_fin: `${lunchEnd}:00`
+      // Validar que las horas semanales no superen 48
+      const totalHours = calculateTotalWeeklyHours()
+      if (totalHours > 48) {
+        setMessage({ text: `Error: No puedes configurar más de 48 horas semanales. Actualmente tienes ${totalHours} horas.`, type: 'error' })
+        setSaving(false)
+        return
       }
 
-      await availabilityService.saveConfig(doctorId, weekly, [lunchPause])
+      await availabilityService.saveConfig(doctorId, weekly, [])
       
       setMessage({ text: '¡Cambios guardados con éxito!', type: 'success' })
       setTimeout(() => setMessage(null), 4000)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
-      setMessage({ text: `Error al guardar: ${err.message || err}`, type: 'error' })
+      const errorMsg = err instanceof Error ? err.message : String(err)
+      setMessage({ text: `Error al guardar: ${errorMsg}`, type: 'error' })
     } finally {
       setSaving(false)
     }
@@ -264,9 +236,10 @@ const closeModal = () => {
       setBlockEnd('')
       setBlockDesc('')
       setMessage({ text: 'Bloqueo de agenda añadido con éxito.', type: 'success' })
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
-      setMessage({ text: `Error al añadir bloqueo: ${err.message || err}`, type: 'error' })
+      const errorMsg = err instanceof Error ? err.message : String(err)
+      setMessage({ text: `Error al añadir bloqueo: ${errorMsg}`, type: 'error' })
     } finally {
       setBlockLoading(false)
     }
@@ -288,7 +261,7 @@ const confirmDeleteBlock = async () => {
       'El bloqueo fue eliminado correctamente.'
     )
 
-  } catch (err) {
+  } catch (err: unknown) {
     console.error(err)
 
     openModal(
@@ -301,24 +274,6 @@ const confirmDeleteBlock = async () => {
     setBlockToDelete(null)
   }
 }
-
-  // Eliminar bloqueo
-  const handleDeleteBlock = async (id: string) => {
-    setBlockToDelete(id)
-    setDeleteModalOpen(true)
-  return
-
-  
-
-    try {
-      await availabilityService.deleteBlock(id)
-      setBlocks(prev => prev.filter(b => b.id !== id))
-      setMessage({ text: 'Bloqueo eliminado con éxito.', type: 'success' })
-    } catch (err: any) {
-      console.error(err)
-      setMessage({ text: 'Error al eliminar el bloqueo.', type: 'error' })
-    }
-  }
 
   // Calcular horas semanales totales configuradas
   const calculateTotalWeeklyHours = () => {
@@ -333,25 +288,10 @@ const confirmDeleteBlock = async () => {
       totalMinutes += Math.max(0, endMins - startMins)
     })
 
-    // Descontar la pausa de almuerzo diaria por cada día de la semana que tenga al menos un rango activo
-    const activeDaysCount = new Set(weekly.map(w => w.dia_semana)).size
-    
-    if (activeDaysCount > 0) {
-      const [lsh, lsm] = lunchStart.split(':').map(Number)
-      const [leh, lem] = lunchEnd.split(':').map(Number)
-      const lunchMins = (leh * 60 + lem) - (lsh * 60 + lsm)
-      
-      if (lunchMins > 0) {
-        totalMinutes -= (lunchMins * activeDaysCount)
-      }
-    }
-
     return Math.max(0, Math.round(totalMinutes / 60))
   }
 
   const totalWeeklyHours = calculateTotalWeeklyHours()
-  const recommendedMaxHours = 48
-  const capacityPercent = Math.min(100, Math.round((totalWeeklyHours / recommendedMaxHours) * 100))
 
   if (loading) {
     return (
@@ -608,97 +548,33 @@ const confirmDeleteBlock = async () => {
             )}
           </div>
 
-          {/* PAUSAS Y ALMUERZO */}
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6">
-            <div className="flex items-center gap-3 border-b border-slate-100 pb-4 mb-4">
-              <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
-                <Coffee size={18} />
-              </div>
-              <h3 className="font-bold text-slate-800 text-base">Pausas y Almuerzo</h3>
-            </div>
 
-            <p className="text-xs text-slate-400 font-medium mb-4 leading-relaxed">
-              Define periodos recurrentes de descanso diarios (no se asignarán citas en estas horas).
-            </p>
-
-            {isEditingLunch ? (
-              <div className="space-y-3 bg-slate-50 border border-slate-100 rounded-2xl p-4 animate-scaleIn">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Inicio</label>
-                    <input
-                      type="time"
-                      value={lunchStart}
-                      onChange={(e) => setLunchStart(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Fin</label>
-                    <input
-                      type="time"
-                      value={lunchEnd}
-                      onChange={(e) => setLunchEnd(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700"
-                    />
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditingLunch(false)}
-                    className="flex-1 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl"
-                  >
-                    Listo
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-slate-100/50 transition">
-                <div className="flex items-center gap-3">
-                  <div className="text-2xl">🍴</div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-700">Almuerzo Diario</p>
-                    <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Recurrente de Lunes a Domingo</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-extrabold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100/50">
-                    {formatTime12h(`${lunchStart}:00`)} - {formatTime12h(`${lunchEnd}:00`)}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setIsEditingLunch(true)}
-                    className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                  >
-                    ✏️
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* RESUMEN DE CARGA */}
-          <div className="bg-gradient-to-br from-blue-900 to-blue-700 text-white rounded-3xl p-6 shadow-lg shadow-blue-900/10">
-            <h4 className="text-[10px] font-bold text-blue-200 uppercase tracking-widest mb-2">Resumen de Carga</h4>
+          <div className={`rounded-3xl p-6 shadow-lg text-white ${
+            totalWeeklyHours <= 48 
+              ? 'bg-gradient-to-br from-green-600 to-green-700 shadow-green-900/10' 
+              : 'bg-gradient-to-br from-red-600 to-red-700 shadow-red-900/10'
+          }`}>
+            <h4 className="text-[10px] font-bold opacity-80 uppercase tracking-widest mb-2">Resumen de Carga</h4>
             
             <p className="text-3xl font-black mb-4">
-              {totalWeeklyHours} Horas <span className="text-sm font-normal text-blue-100">/ Semana</span>
+              {totalWeeklyHours} Horas <span className="text-sm font-normal opacity-90">/ Máx 48</span>
             </p>
 
-            <div className="w-full bg-blue-950/40 rounded-full h-2.5 mb-3.5">
+            <div className="w-full bg-white/20 rounded-full h-2.5 mb-3.5">
               <div
-                style={{ width: `${capacityPercent}%` }}
-                className="bg-emerald-400 h-2.5 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(100, (totalWeeklyHours / 48) * 100)}%` }}
+                className={`h-2.5 rounded-full transition-all duration-500 ${
+                  totalWeeklyHours <= 48 ? 'bg-white' : 'bg-amber-300'
+                }`}
               />
             </div>
 
-            <p className="text-xs text-blue-100 font-medium leading-relaxed">
-              {capacityPercent > 90
-                ? '¡Atención! Estás muy cerca de tu límite de horas recomendadas.'
-                : `Estás al ${capacityPercent}% de tu capacidad máxima semanal recomendada (${recommendedMaxHours} hrs).`}
+            <p className="text-xs opacity-90 font-medium leading-relaxed">
+              {totalWeeklyHours > 48
+                ? `⚠ Excediste el límite de 48 horas. Tienes ${totalWeeklyHours - 48} horas de más.`
+                : `Tienes ${48 - totalWeeklyHours} horas disponibles para configurar.`}
             </p>
           </div>
 
