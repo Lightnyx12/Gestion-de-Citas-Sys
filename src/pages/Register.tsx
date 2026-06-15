@@ -11,6 +11,7 @@ const determineUserRole = (email: string) => {
 
 export default function Register() {
   const [fullName, setFullName] = useState('')
+  const [dni, setDni] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -48,6 +49,16 @@ export default function Register() {
 
     if (!fullName.trim()) {
       setError('El nombre completo es requerido')
+      return
+    }
+
+    if (!dni.trim()) {
+      setError('El DNI es requerido')
+      return
+    }
+
+    if (!/^\d{8}$/.test(dni.trim())) {
+      setError('El DNI debe contener exactamente 8 dígitos numéricos')
       return
     }
 
@@ -110,6 +121,7 @@ export default function Register() {
             id: data.user.id,
             email: email,
             full_name: fullName,
+            dni: dni.trim(),
             user_role: userRole
           }
         ], { onConflict: 'id' })
@@ -121,6 +133,7 @@ export default function Register() {
       console.log('Cuenta creada exitosamente:', data.user)
       setError('') // Limpiar errores
       setFullName('')
+      setDni('')
       setEmail('')
       setPassword('')
       setConfirmPassword('')
@@ -186,6 +199,24 @@ export default function Register() {
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
                   placeholder="John Doe Luthor"
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="dni" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  DNI
+                </label>
+                <input
+                  type="text"
+                  name="dni"
+                  id="dni"
+                  value={dni}
+                  onChange={(e) => setDni(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+                  placeholder="12345678"
+                  maxLength={8}
+                  inputMode="numeric"
                   required
                 />
               </div>

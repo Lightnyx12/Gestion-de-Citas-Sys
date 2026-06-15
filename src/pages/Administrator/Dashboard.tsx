@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Calendar, Users, Stethoscope, MessageSquare, Loader2, Clock } from 'lucide-react'
+import { parseNaiveDateTime } from '../../lib/date-utils'
 
 interface RecentAppointment {
   id: string
@@ -94,20 +95,28 @@ export default function AdministratorDashboard() {
   const formatState = (status: string) => {
     const statuses: Record<string, string> = {
       pendiente: 'Pendiente',
-      confirmada: 'Confirmada',
-      cancelada: 'Cancelada'
+      cancelada: 'Cancelada',
+      completada: 'Completada',
+      reprogramada: 'Reprogramada',
+      no_asistio: 'No asistió'
     }
     return statuses[status.toLowerCase()] || status
   }
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case 'confirmada':
-        return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900/30'
       case 'pendiente':
-        return 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-100 dark:border-amber-900/30'
+        return 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-900/30'
+      case 'completada':
+        return 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300 border-sky-200 dark:border-sky-900/30'
+      case 'cancelada':
+        return 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200 dark:border-rose-900/30'
+      case 'reprogramada':
+        return 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300 border-violet-200 dark:border-violet-900/30'
+      case 'no_asistio':
+        return 'bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300 border-orange-200 dark:border-orange-900/30'
       default:
-        return 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-100 dark:border-rose-900/30'
+        return 'bg-slate-50 text-slate-600 dark:bg-slate-800/40 dark:text-slate-400 border-slate-200 dark:border-slate-700/30'
     }
   }
 
@@ -229,7 +238,7 @@ export default function AdministratorDashboard() {
                       {apt.doctores ? `Dr. ${apt.doctores.nombre} ${apt.doctores.apellido}` : 'Médico General'}
                     </td>
                     <td className="py-4 font-medium text-slate-500 dark:text-slate-400">
-                      {new Date(apt.fecha_hora).toLocaleDateString('es-ES', {
+                      {parseNaiveDateTime(apt.fecha_hora).toLocaleDateString('es-ES', {
                         day: 'numeric',
                         month: 'short',
                         hour: '2-digit',
