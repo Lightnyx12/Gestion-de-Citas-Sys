@@ -102,7 +102,7 @@ const AppointmentsCenter = () => {
     } else if (activeTab === "upcoming") {
       return appointments.filter((a) => {
         const isFuture = getLocalDateStr(a.fecha_hora) > todayStr;
-        return isFuture && (a.estado === "pendiente" || a.estado === "confirmada");
+        return isFuture && a.estado === "pendiente";
       });
     } else {
       return appointments.filter((a) => a.estado === "completada");
@@ -115,7 +115,7 @@ const AppointmentsCenter = () => {
     if (explicit) return explicit;
     return (
       filteredAppointments.find(
-        (a) => a.estado === "pendiente" || a.estado === "confirmada"
+        (a) => a.estado === "pendiente"
       ) ?? filteredAppointments[0]
     );
   }, [filteredAppointments, selectedApptId]);
@@ -237,7 +237,7 @@ const AppointmentsCenter = () => {
   const todayAppointments = appointments.filter((a) => getLocalDateStr(a.fecha_hora) === todayStr);
   const upcomingAppointments = appointments.filter((a) => {
     const isFuture = getLocalDateStr(a.fecha_hora) > todayStr;
-    return isFuture && (a.estado === "pendiente" || a.estado === "confirmada");
+    return isFuture && a.estado === "pendiente";
   });
   const completedAppointments = appointments.filter((a) => a.estado === "completada");
 

@@ -6,7 +6,7 @@ export interface Appointment {
   doctor_id: string;
   fecha_hora: string;
   motivo: string | null;        // nullable — columna añadida posteriormente
-  estado: "pendiente" | "confirmada" | "cancelada" | "completada";
+  estado: "pendiente" | "cancelada" | "completada" | "reprogramada" | "no_asistio";
   notas: string | null;         // nullable — columna añadida posteriormente
   reprogramada_de: string | null;
   fecha_hora_original: string | null;

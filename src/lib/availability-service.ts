@@ -286,14 +286,14 @@ export const availabilityService = {
         return []
       }
 
-      // 4. Obtener citas ocupadas (estado confirmada o pendiente)
+      // 4. Obtener citas ocupadas (estado pendiente o completada)
       const { data: citas, error: citasErr } = await supabase
         .from('citas')
         .select('fecha_hora')
         .eq('doctor_id', doctorId)
         .gte('fecha_hora', `${fecha}T00:00:00`)
         .lte('fecha_hora', `${fecha}T23:59:59`)
-        .in('estado', ['confirmada', 'pendiente'])
+        .in('estado', ['pendiente', 'completada'])
 
       if (citasErr) throw new Error(`Error al obtener citas: ${citasErr.message}`)
 

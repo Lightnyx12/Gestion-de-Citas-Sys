@@ -17,7 +17,7 @@ const SelectedPatientCard = ({
   onAttend,
   onOpenDiagnosis,
 }: SelectedPatientCardProps) => {
-  const isPending = appt.estado === "pendiente" || appt.estado === "confirmada";
+  const isPending = appt.estado === "pendiente";
   const isCompleted = appt.estado === "completada";
 
   return (
