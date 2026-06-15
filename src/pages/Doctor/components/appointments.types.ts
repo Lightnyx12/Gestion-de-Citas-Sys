@@ -34,51 +34,10 @@ export type ModalType = "success" | "error" | "warning";
 
 // ─── Utilidades de fecha/hora ─────────────────────────────────────────────────
 
-export const getLocalDateStr = (fechaHoraStr: string): string => {
-  if (!fechaHoraStr) return "";
-  try {
-    const date = new Date(fechaHoraStr.replace(" ", "T"));
-    if (isNaN(date.getTime())) {
-      return fechaHoraStr.includes("T")
-        ? fechaHoraStr.split("T")[0]
-        : fechaHoraStr.split(" ")[0];
-    }
-    return date.toLocaleDateString("sv-SE");
-  } catch {
-    return fechaHoraStr.includes("T")
-      ? fechaHoraStr.split("T")[0]
-      : fechaHoraStr.split(" ")[0];
-  }
-};
+export {
+  parseNaiveDateTime,
+  getLocalDateStr,
+  formatApptDate,
+  formatTime12h
+} from "../../../lib/date-utils";
 
-export const formatApptDate = (fechaHoraStr: string): string => {
-  if (!fechaHoraStr) return "";
-  try {
-    const date = new Date(fechaHoraStr.replace(" ", "T"));
-    if (isNaN(date.getTime())) {
-      return fechaHoraStr.split(" ")[0] || fechaHoraStr;
-    }
-    return date.toLocaleDateString("es-ES", { day: "2-digit", month: "short" });
-  } catch {
-    return fechaHoraStr.split(" ")[0] || fechaHoraStr;
-  }
-};
-
-export const formatTime12h = (fechaHoraStr: string): string => {
-  if (!fechaHoraStr) return "";
-  try {
-    const date = new Date(fechaHoraStr.replace(" ", "T"));
-    if (isNaN(date.getTime())) {
-      const timePart =
-        fechaHoraStr.split(" ")[1] || fechaHoraStr.split("T")[1] || "";
-      return timePart.substring(0, 5);
-    }
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-  } catch {
-    return "";
-  }
-};

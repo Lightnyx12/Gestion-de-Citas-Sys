@@ -82,7 +82,7 @@ export const availabilityService = {
 
     // 2. Insertar nuevos semanales si existen
     if (weekly.length > 0) {
-      const weeklyData = weekly.map(item => ({ ...item, doctor_id: doctorId }))
+      const weeklyData = weekly.map(({ id, ...rest }) => ({ ...rest, doctor_id: doctorId }))
       const { error: insWeeklyErr } = await supabase
         .from('disponibilidad_semanal')
         .insert(weeklyData)
@@ -92,7 +92,7 @@ export const availabilityService = {
 
     // 3. Insertar nuevas pausas si existen
     if (pauses.length > 0) {
-      const pausesData = pauses.map(item => ({ ...item, doctor_id: doctorId }))
+      const pausesData = pauses.map(({ id, ...rest }) => ({ ...rest, doctor_id: doctorId }))
       const { error: insPausesErr } = await supabase
         .from('pausas_recurrentes')
         .insert(pausesData)
@@ -171,12 +171,9 @@ export const availabilityService = {
     const weeklyRanges = weeklyRes.data as WeeklyAvailability[]
     const pauses = pausesRes.data as RecurrentPause[]
     const occupiedTimes = (occupiedRes.data || []).map(item => {
-      // Extrae la hora de la fecha en formato HH:MM (asumiendo formato ISO o UTC)
-      // Usaremos un formateo limpio
-      const dateObj = new Date(item.fecha_hora)
-      const hours = String(dateObj.getHours()).padStart(2, '0')
-      const minutes = String(dateObj.getMinutes()).padStart(2, '0')
-      return `${hours}:${minutes}`
+      // Extrae la hora de la fecha de forma independiente de la zona horaria
+      const match = item.fecha_hora.match(/(?:T|\s)(\d{2}):(\d{2})/);
+      return match ? `${match[1]}:${match[2]}` : "00:00";
     })
 
     if (weeklyRanges.length === 0) {
@@ -215,7 +212,7 @@ export const availabilityService = {
 
       // C. Si es hoy, ¿ya pasó la hora?
       const now = new Date()
-      const todayStr = now.toISOString().split('T')[0]
+      const todayStr = now.toLocaleDateString('sv-SE') // local date YYYY-MM-DD
       if (dateStr === todayStr) {
         const nowMins = now.getHours() * 60 + now.getMinutes()
         if (slotMins <= nowMins) return false
@@ -300,14 +297,14 @@ export const availabilityService = {
 
       if (citasErr) throw new Error(`Error al obtener citas: ${citasErr.message}`)
 
-      // Convertir horas de citas ocupadas a formato HH:MM
+      // Convertir horas de citas ocupadas a formato HH:MM de forma independiente de la zona horaria
       const horasOcupadas = new Set<string>()
       if (citas && citas.length > 0) {
         citas.forEach(cita => {
-          const dateObj = new Date(cita.fecha_hora)
-          const hours = String(dateObj.getHours()).padStart(2, '0')
-          const minutes = String(dateObj.getMinutes()).padStart(2, '0')
-          horasOcupadas.add(`${hours}:${minutes}`)
+          const match = cita.fecha_hora.match(/(?:T|\s)(\d{2}):(\d{2})/);
+          if (match) {
+            horasOcupadas.add(`${match[1]}:${match[2]}`);
+          }
         })
       }
 

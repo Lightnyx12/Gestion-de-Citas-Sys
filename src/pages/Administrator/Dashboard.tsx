@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Calendar, Users, Stethoscope, MessageSquare, Loader2, Clock } from 'lucide-react'
+import { parseNaiveDateTime } from '../../lib/date-utils'
 
 interface RecentAppointment {
   id: string
@@ -229,7 +230,7 @@ export default function AdministratorDashboard() {
                       {apt.doctores ? `Dr. ${apt.doctores.nombre} ${apt.doctores.apellido}` : 'Médico General'}
                     </td>
                     <td className="py-4 font-medium text-slate-500 dark:text-slate-400">
-                      {new Date(apt.fecha_hora).toLocaleDateString('es-ES', {
+                      {parseNaiveDateTime(apt.fecha_hora).toLocaleDateString('es-ES', {
                         day: 'numeric',
                         month: 'short',
                         hour: '2-digit',

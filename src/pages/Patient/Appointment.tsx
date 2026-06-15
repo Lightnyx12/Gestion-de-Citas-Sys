@@ -2,6 +2,7 @@ import ReprogramModal from "../../components/ReprogramModal";
 import { useEffect, useState } from "react";
 
 import { Calendar, Clock, FileText, User } from "lucide-react";
+import { parseNaiveDateTime } from "../../lib/date-utils";
 
 import {
   cancelAppointment,
@@ -62,9 +63,7 @@ const Appointments = () => {
 };
 
   const parseAppointmentDate = (str: string) => {
-    if (!str) return new Date();
-    // Reemplaza el espacio con T para compatibilidad total con Safari y Firefox
-    return new Date(str.replace(" ", "T"));
+    return parseNaiveDateTime(str);
   };
 
   const getAppointmentTime = (fechaHoraStr: string) => {

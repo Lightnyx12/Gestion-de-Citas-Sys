@@ -445,11 +445,30 @@ export const rescheduleAppointment =
       );
     }
 
+    // CANCEL OLD FIRST — so the old appointment doesn't
+    // interfere with same-day or occupied-time validations
+    const { error: cancelError } = await supabase
+      .from("citas")
+      .update({
+        estado: "cancelada",
+      })
+      .eq("id", appointmentId);
+
+    if (cancelError) {
+      throw cancelError;
+    }
+
     // VALIDATE NO EXISTING APPOINTMENT ON NEW DATE
     const alreadyHasAppointment =
       await hasAppointmentSameDay(newDate);
 
     if (alreadyHasAppointment) {
+      // Restore old appointment since we already cancelled it
+      await supabase
+        .from("citas")
+        .update({ estado: "pendiente" })
+        .eq("id", appointmentId);
+
       throw new Error(
         "Ya tienes una cita ese día"
       );
@@ -462,18 +481,16 @@ export const rescheduleAppointment =
     );
 
     if (occupied.includes(newTime)) {
+      // Restore old appointment since we already cancelled it
+      await supabase
+        .from("citas")
+        .update({ estado: "pendiente" })
+        .eq("id", appointmentId);
+
       throw new Error(
         "Horario ocupado"
       );
     }
-
-    // CANCEL OLD
-    await supabase
-      .from("citas")
-      .update({
-        estado: "cancelada",
-      })
-      .eq("id", appointmentId);
 
     // CREATE NEW
     const { error } =
@@ -497,6 +514,12 @@ export const rescheduleAppointment =
         });
 
     if (error) {
+      // Restore old appointment if insert fails
+      await supabase
+        .from("citas")
+        .update({ estado: "pendiente" })
+        .eq("id", appointmentId);
+
       throw error;
     }
 

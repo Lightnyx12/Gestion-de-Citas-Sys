@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Calendar, Clock, X } from "lucide-react";
+import { Calendar, Clock, X, AlertCircle } from "lucide-react";
 
 import {
-  AVAILABLE_TIMES,
-  getOccupiedTimes,
   rescheduleAppointment,
 } from "../lib/appointment-service";
+import { availabilityService } from "../lib/availability-service";
+import { parseNaiveDateTime } from "../lib/date-utils";
 
 interface Props {
   open: boolean;
@@ -22,7 +22,10 @@ const ReprogramModal = ({
 }: Props) => {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
-  const [occupiedTimes, setOccupiedTimes] = useState<string[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [isDoctorBlocked, setIsDoctorBlocked] = useState(false);
+  const [doctorBlockReason, setDoctorBlockReason] = useState("");
   const [loading, setLoading] = useState(false);
   const [closing, setClosing] = useState(false);
 
@@ -36,57 +39,67 @@ const ReprogramModal = ({
 
   useEffect(() => {
     setSelectedTime(""); // Limpiar hora seleccionada al cambiar la fecha
+    setAvailableSlots([]);
+    setIsDoctorBlocked(false);
     if (!appointment || !selectedDate) return;
-    loadOccupiedTimes();
+    loadAvailableSlots();
   }, [selectedDate, appointment]);
+
   const openFeedbackModal = (
-  title: string,
-  message: string
-) => {
-  setFeedbackModal({
-    open: true,
-    title,
-    message,
-  });
-};
-
-const closeFeedbackModal = () => {
-  setFeedbackClosing(true);
-
-  setTimeout(() => {
-    setFeedbackClosing(false);
-
+    title: string,
+    message: string
+  ) => {
     setFeedbackModal({
-      open: false,
-      title: "",
-      message: "",
+      open: true,
+      title,
+      message,
     });
-  }, 250);
-};
+  };
 
-const handleClose = () => {
-  setClosing(true);
+  const closeFeedbackModal = () => {
+    setFeedbackClosing(true);
 
-  setTimeout(() => {
-    setSelectedDate("");
-    setSelectedTime("");
-    setOccupiedTimes([]);
-    setClosing(false);
-    onClose();
-  }, 250);
-};
+    setTimeout(() => {
+      setFeedbackClosing(false);
 
-  const loadOccupiedTimes = async () => {
+      setFeedbackModal({
+        open: false,
+        title: "",
+        message: "",
+      });
+    }, 250);
+  };
+
+  const handleClose = () => {
+    setClosing(true);
+
+    setTimeout(() => {
+      setSelectedDate("");
+      setSelectedTime("");
+      setAvailableSlots([]);
+      setIsDoctorBlocked(false);
+      setClosing(false);
+      onClose();
+    }, 250);
+  };
+
+  const loadAvailableSlots = async () => {
     try {
-      const data = await getOccupiedTimes(
+      setLoadingSlots(true);
+      const res = await availabilityService.getAvailableSlots(
         appointment.doctor_id,
         selectedDate
       );
-      setOccupiedTimes(data);
+      setAvailableSlots(res.slots);
+      setIsDoctorBlocked(res.blocked);
+      setDoctorBlockReason(res.blockReason || "");
     } catch (error) {
-      console.error(error);
+      console.error("Error al cargar horarios:", error);
+    } finally {
+      setLoadingSlots(false);
     }
   };
+
 
   const handleConfirm = async () => {
     try {
@@ -110,7 +123,7 @@ const handleClose = () => {
       // Resetear estados al tener éxito
       setSelectedDate("");
       setSelectedTime("");
-      setOccupiedTimes([]);
+      setAvailableSlots([]);
 
       openFeedbackModal(
         "Cita reprogramada",
@@ -120,7 +133,7 @@ const handleClose = () => {
       setTimeout(() => {
         handleClose();
       }, 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       openFeedbackModal(
         "Error",
@@ -132,8 +145,7 @@ const handleClose = () => {
   };
 
   const parseAppointmentDate = (str: string) => {
-    if (!str) return new Date();
-    return new Date(str.replace(" ", "T"));
+    return parseNaiveDateTime(str);
   };
 
   const getAppointmentTime = (fechaHoraStr: string) => {
@@ -146,7 +158,7 @@ const handleClose = () => {
     if (!fechaHoraStr) return "";
     const date = parseAppointmentDate(fechaHoraStr);
     if (isNaN(date.getTime())) return fechaHoraStr.split(" ")[0] || "";
-    
+
     const rawDateStr = date.toLocaleDateString("es-ES", {
       weekday: "long",
       day: "numeric",
@@ -162,18 +174,16 @@ const handleClose = () => {
 
   return (
     <div
-      className={`fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 md:p-6 ${
-      closing
+      className={`fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 md:p-6 ${closing
         ? "animate-fadeOut"
         : "animate-fadeIn"
-      }`}
-    >
-      <div 
-        className={`w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] ${
-          closing
-            ? "animate-scaleOut"
-            : "animate-scaleIn"
         }`}
+    >
+      <div
+        className={`w-full max-w-2xl bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] ${closing
+          ? "animate-modalOut"
+          : "animate-modalIn"
+          }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* HEADER */}
@@ -253,27 +263,35 @@ const handleClose = () => {
                   <Calendar size={18} className="text-gray-300" />
                   <span>Selecciona una fecha primero</span>
                 </div>
+              ) : loadingSlots ? (
+                <div className="text-center text-gray-400 py-6 italic text-sm font-medium bg-gray-50 rounded-xl border border-dashed border-gray-200 flex flex-col items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-900"></div>
+                  <span>Buscando horarios disponibles...</span>
+                </div>
+              ) : isDoctorBlocked ? (
+                <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-sm font-medium">
+                  <AlertCircle className="w-5 h-5 shrink-0 text-amber-600" />
+                  <span>El médico no estará disponible: {doctorBlockReason || "Vacaciones / Licencia"}</span>
+                </div>
+              ) : availableSlots.length === 0 ? (
+                <div className="text-center text-gray-400 py-6 italic text-sm font-medium bg-gray-50 rounded-xl border border-dashed border-gray-200 flex flex-col items-center justify-center gap-1">
+                  <Clock size={18} className="text-gray-300" />
+                  <span>No hay horarios disponibles para esta fecha</span>
+                </div>
               ) : (
                 <div className="grid grid-cols-2 gap-2.5 max-h-[160px] overflow-y-auto pr-1">
-                  {AVAILABLE_TIMES.map((time) => {
-                    const isOccupied = occupiedTimes.includes(time);
-                    return (
-                      <button
-                        key={time}
-                        disabled={isOccupied}
-                        className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer text-center ${
-                          isOccupied
-                            ? "bg-gray-150 border-gray-200 text-gray-350 cursor-not-allowed opacity-50"
-                            : selectedTime === time
-                            ? "bg-blue-900 text-white border-blue-900 hover:bg-blue-800"
-                            : "bg-gray-50 border-gray-200 text-gray-700 hover:bg-blue-50/50 hover:border-blue-300"
+                  {availableSlots.map((time) => (
+                    <button
+                      key={time}
+                      className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer text-center ${selectedTime === time
+                        ? "bg-blue-900 text-white border-blue-900 hover:bg-blue-800"
+                        : "bg-gray-50 border-gray-200 text-gray-700 hover:bg-blue-50/50 hover:border-blue-300"
                         }`}
-                        onClick={() => setSelectedTime(time)}
-                      >
-                        {time} hrs
-                      </button>
-                    );
-                  })}
+                      onClick={() => setSelectedTime(time)}
+                    >
+                      {time} hrs
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
@@ -290,11 +308,10 @@ const handleClose = () => {
           </button>
 
           <button
-            className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
-              loading || !selectedDate || !selectedTime
-                ? "bg-blue-900/40 text-white/60 cursor-not-allowed border-0"
-                : "bg-blue-900 hover:bg-blue-800 text-white cursor-pointer shadow-sm"
-            }`}
+            className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${loading || !selectedDate || !selectedTime
+              ? "bg-blue-900/40 text-white/60 cursor-not-allowed border-0"
+              : "bg-blue-900 hover:bg-blue-800 text-white cursor-pointer shadow-sm"
+              }`}
             onClick={handleConfirm}
             disabled={loading || !selectedDate || !selectedTime}
           >
@@ -303,40 +320,38 @@ const handleClose = () => {
         </div>
       </div>
       {feedbackModal.open && (
-  <div
-    className={`fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4 ${
-      feedbackClosing
-        ? "animate-fadeOut"
-        : "animate-fadeIn"
-    }`}
-  >
-    <div
-      className={`bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 ${
-        feedbackClosing
-          ? "animate-scaleOut"
-          : "animate-scaleIn"
-      }`}
-    >
-      <h3 className="text-xl font-bold text-gray-800 mb-3">
-        {feedbackModal.title}
-      </h3>
-
-      <p className="text-gray-600 mb-6">
-        {feedbackModal.message}
-      </p>
-
-      <div className="flex justify-end">
-        <button
-          onClick={closeFeedbackModal}
-          className="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-xl font-semibold transition-all cursor-pointer"
+        <div
+          className={`fixed inset-0 z-[10000] flex items-center justify-center bg-black/50 p-4 ${feedbackClosing
+            ? "animate-fadeOut"
+            : "animate-fadeIn"
+            }`}
         >
-          Aceptar
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-<style>{`
+          <div
+            className={`bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 ${feedbackClosing
+              ? "animate-modalOut"
+              : "animate-modalIn"
+              }`}
+          >
+            <h3 className="text-xl font-bold text-gray-800 mb-3">
+              {feedbackModal.title}
+            </h3>
+
+            <p className="text-gray-600 mb-6">
+              {feedbackModal.message}
+            </p>
+
+            <div className="flex justify-end">
+              <button
+                onClick={closeFeedbackModal}
+                className="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-xl font-semibold transition-all cursor-pointer"
+              >
+                Aceptar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      <style>{`
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -401,7 +416,7 @@ const handleClose = () => {
   animation: modalOut 0.3s ease forwards;
 }
 `}
-</style>
+      </style>
     </div>
   );
 };

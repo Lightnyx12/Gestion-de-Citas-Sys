@@ -36,21 +36,21 @@ const Suport = () => {
   const [modalClosing, setModalClosing] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
-  
+
   const openModal = (title: string, message: string) => {
-  setModalTitle(title);
-  setModalMessage(message);
-  setModalOpen(true);
-};
+    setModalTitle(title);
+    setModalMessage(message);
+    setModalOpen(true);
+  };
 
   const closeModal = () => {
-  setModalClosing(true);
+    setModalClosing(true);
 
-  setTimeout(() => {
-    setModalClosing(false);
-    setModalOpen(false);
-  }, 250);
-};
+    setTimeout(() => {
+      setModalClosing(false);
+      setModalOpen(false);
+    }, 250);
+  };
 
 
   /* =====================================
@@ -72,56 +72,56 @@ const Suport = () => {
       ENVIAR FEEDBACK
   ===================================== */
   const handleSubmit = async () => {
-  try {
-    const cleanMessage = message.replace(/\s/g, "");
+    try {
+      const cleanMessage = message.replace(/\s/g, "");
 
-    if (!message.trim()) {
-      return openModal(
-        "Mensaje requerido",
-        "Debes escribir un comentario antes de enviarlo."
+      if (!message.trim()) {
+        return openModal(
+          "Mensaje requerido",
+          "Debes escribir un comentario antes de enviarlo."
+        );
+      }
+
+      if (!rating) {
+        return openModal(
+          "Calificación requerida",
+          "Debes seleccionar una calificación."
+        );
+      }
+
+      if (cleanMessage.length < 50) {
+        return openModal(
+          "Mensaje demasiado corto",
+          "Tu comentario debe contener al menos 50 caracteres sin contar espacios."
+        );
+      }
+
+      setLoading(true);
+
+      await sendAnonymousFeedback(
+        message,
+        rating
       );
-    }
 
-    if (!rating) {
-      return openModal(
-        "Calificación requerida",
-        "Debes seleccionar una calificación."
+      openModal(
+        "Comentario enviado",
+        "Gracias por compartir tu opinión. Tu feedback fue enviado correctamente."
       );
-    }
 
-    if (cleanMessage.length < 50) {
-      return openModal(
-        "Mensaje demasiado corto",
-        "Tu comentario debe contener al menos 50 caracteres sin contar espacios."
+      setMessage("");
+      setRating(5);
+
+    } catch (error) {
+      console.error(error);
+
+      openModal(
+        "Error",
+        "Ocurrió un error al enviar tu feedback. Inténtalo nuevamente."
       );
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(true);
-
-    await sendAnonymousFeedback(
-      message,
-      rating
-    );
-
-    openModal(
-      "Comentario enviado",
-      "Gracias por compartir tu opinión. Tu feedback fue enviado correctamente."
-    );
-
-    setMessage("");
-    setRating(5);
-
-  } catch (error) {
-    console.error(error);
-
-    openModal(
-      "Error",
-      "Ocurrió un error al enviar tu feedback. Inténtalo nuevamente."
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen p-4 md:p-6 bg-gray-50/50">
@@ -184,53 +184,17 @@ const Suport = () => {
               </div>
             </a>
 
-            {/* FAQ SECTION */}
-<div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-  <h3 className="text-base font-bold text-gray-800 mb-4 pb-2 border-b border-gray-50">
-    Preguntas Frecuentes
-  </h3>
+            {/* PRIVACY CARD */}
+            <div className="bg-gradient-to-br from-gray-800 to-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-md border-0">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
+                Privacidad Garantizada
+              </p>
 
-  <div className="divide-y divide-gray-100">
-    {questions.map((item, index) => {
-      const isOpen = openQuestion === index;
-
-      return (
-        <div key={index} className="py-4 first:pt-0 last:pb-0">
-          <div
-            className="flex justify-between items-center cursor-pointer font-bold text-sm text-gray-700 hover:text-blue-900 transition-all select-none gap-3"
-            onClick={() =>
-              setOpenQuestion(isOpen ? null : index)
-            }
-          >
-            <span>{item.question}</span>
-
-            <ChevronDown
-              className={`w-4 h-4 shrink-0 transition-transform duration-300 ${
-                isOpen
-                  ? "rotate-180 text-blue-900"
-                  : "rotate-0 text-gray-400"
-              }`}
-            />
-          </div>
-
-          <div
-            className={`grid transition-all duration-300 ease-in-out ${
-              isOpen
-                ? "grid-rows-[1fr] opacity-100 mt-3"
-                : "grid-rows-[0fr] opacity-0 mt-0"
-            }`}
-          >
-            <div className="overflow-hidden">
-              <div className="text-xs text-gray-500 leading-relaxed bg-gray-50 p-3 rounded-xl border border-gray-100">
-                {item.answer}
-              </div>
+              <p className="text-lg md:text-xl font-bold text-white max-w-2xl leading-normal">
+                Tus datos y comentarios son manejados de forma anónima y segura bajo los estándares de confidencialidad de datos médicos.
+              </p>
             </div>
-          </div>
-        </div>
-      );
-    })}
-  </div>
-</div>
+
           </div>
 
           {/* RIGHT COLUMN: OPINION FORM & PRIVACY */}
@@ -261,13 +225,12 @@ const Suport = () => {
                   </span>
 
                   <span
-                    className={`text-xs font-semibold ${
-                      message.replace(/\s/g, "").length >= 50
-                      ? "text-green-600"
-                      : "text-red-500"
-                    }`}
+                    className={`text-xs font-semibold ${message.replace(/\s/g, "").length >= 50
+                        ? "text-green-600"
+                        : "text-red-500"
+                      }`}
                   >
-                  {message.replace(/\s/g, "").length}/50
+                    {message.replace(/\s/g, "").length}/50
                   </span>
                 </div>
               </div>
@@ -283,11 +246,10 @@ const Suport = () => {
                     <button
                       key={num}
                       type="button"
-                      className={`w-12 h-12 rounded-full border font-bold text-sm transition-all cursor-pointer ${
-                        rating === num
+                      className={`w-12 h-12 rounded-full border font-bold text-sm transition-all cursor-pointer ${rating === num
                           ? "bg-blue-900 border-blue-900 text-white scale-105 shadow-md shadow-blue-900/20"
                           : "border-gray-200 bg-gray-55 text-gray-700 hover:bg-blue-50/50 hover:border-blue-300"
-                      }`}
+                        }`}
                       onClick={() => setRating(num)}
                     >
                       {num}
@@ -312,50 +274,39 @@ const Suport = () => {
               </div>
             </div>
 
-            {/* PRIVACY CARD */}
-            <div className="bg-gradient-to-br from-gray-800 to-slate-900 text-white rounded-2xl p-6 md:p-8 shadow-md border-0">
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">
-                Privacidad Garantizada
-              </p>
 
-              <p className="text-lg md:text-xl font-bold text-white max-w-2xl leading-normal">
-                Tus datos y comentarios son manejados de forma anónima y segura bajo los estándares de confidencialidad de datos médicos.
-              </p>
-            </div>
           </div>
         </div>
       </div>
       {modalOpen && (
-  <div
-    className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 ${
-      modalClosing ? "animate-fadeOut" : "animate-fadeIn"
-    }`}
-  >
-    <div
-      className={`bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 ${
-        modalClosing ? "animate-scaleOut" : "animate-scaleIn"
-      }`}
-    >
-      <h3 className="text-xl font-bold text-gray-800 mb-3">
-        {modalTitle}
-      </h3>
-
-      <p className="text-gray-600 mb-6">
-        {modalMessage}
-      </p>
-
-      <div className="flex justify-end">
-        <button
-          onClick={closeModal}
-          className="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-xl font-semibold transition-all cursor-pointer"
+        <div
+          className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 ${modalClosing ? "animate-fadeOut" : "animate-fadeIn"
+            }`}
         >
-          Aceptar
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-<style>{`
+          <div
+            className={`bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 ${modalClosing ? "animate-scaleOut" : "animate-scaleIn"
+              }`}
+          >
+            <h3 className="text-xl font-bold text-gray-800 mb-3">
+              {modalTitle}
+            </h3>
+
+            <p className="text-gray-600 mb-6">
+              {modalMessage}
+            </p>
+
+            <div className="flex justify-end">
+              <button
+                onClick={closeModal}
+                className="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-xl font-semibold transition-all cursor-pointer"
+              >
+                Aceptar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      <style>{`
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -420,7 +371,7 @@ const Suport = () => {
   animation: modalOut 0.3s ease forwards;
 }
 `}
-</style>
+      </style>
     </div>
   );
 };
