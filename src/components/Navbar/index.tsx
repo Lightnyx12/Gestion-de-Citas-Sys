@@ -9,9 +9,24 @@ import NavbarNotificationsDropdown from './NavbarNotificationsDropdown';
 // ─── Etiqueta y color por rol ────────────────────────────────────────────────
 
 const ROLE_META = {
-  patient: { label: 'Paciente',  Icon: UserRound,   color: 'text-violet-600', bg: 'bg-violet-100' },
-  doctor:  { label: 'Médico',    Icon: Stethoscope,  color: 'text-blue-600',   bg: 'bg-blue-100'   },
-  admin:   { label: 'Administrador', Icon: ShieldCheck, color: 'text-emerald-600', bg: 'bg-emerald-100' },
+  patient: {
+    label: 'Paciente',
+    Icon: UserRound,
+    labelColor: 'text-violet-800',
+    avatarClass: 'bg-violet-800 text-white',
+  },
+  doctor: {
+    label: 'Médico',
+    Icon: Stethoscope,
+    labelColor: 'text-blue-800',
+    avatarClass: 'bg-blue-900 text-white',
+  },
+  admin: {
+    label: 'Administrador',
+    Icon: ShieldCheck,
+    labelColor: 'text-emerald-800',
+    avatarClass: 'bg-emerald-800 text-white',
+  },
 } as const;
 
 // ─── Helper: iniciales del nombre ────────────────────────────────────────────
@@ -114,8 +129,11 @@ export default function Navbar() {
               className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl hover:bg-gray-100 transition cursor-pointer"
             >
               {/* Avatar */}
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0
-                ${roleMeta?.bg ?? 'bg-gray-100'} ${roleMeta?.color ?? 'text-gray-600'}`}>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+                  roleMeta?.avatarClass ?? 'bg-gray-800 text-white'
+                }`}
+              >
                 {initials}
               </div>
 
@@ -125,7 +143,7 @@ export default function Navbar() {
                   {user?.name ?? 'Usuario'}
                 </span>
                 {roleMeta && (
-                  <span className={`text-[10px] font-medium ${roleMeta.color}`}>
+                  <span className={`text-[10px] font-semibold ${roleMeta.labelColor}`}>
                     {roleMeta.label}
                   </span>
                 )}
@@ -133,7 +151,7 @@ export default function Navbar() {
 
               <ChevronDown
                 size={14}
-                className={`text-gray-400 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`}
+                className={`text-gray-700 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`}
               />
             </button>
 
@@ -146,15 +164,18 @@ export default function Navbar() {
                 {/* Info del usuario */}
                 <div className="px-4 py-3.5 border-b border-gray-100 bg-gray-50/60">
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-bold shrink-0
-                      ${roleMeta?.bg ?? 'bg-gray-100'} ${roleMeta?.color ?? 'text-gray-600'}`}>
-                      {initials}
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-base font-bold shrink-0 ${
+                        roleMeta?.avatarClass ?? 'bg-gray-800 text-white'
+                      }`}
+                    > 
+                    {initials}
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-gray-800 truncate">{user?.name ?? '—'}</p>
                       <p className="text-xs text-gray-500 truncate">{user?.email ?? '—'}</p>
                       {roleMeta && RoleIcon && (
-                        <div className={`flex items-center gap-1 mt-0.5 ${roleMeta.color}`}>
+                        <div className={`flex items-center gap-1 mt-0.5 ${roleMeta.labelColor}`}>
                           <RoleIcon size={10} />
                           <span className="text-[10px] font-semibold">{roleMeta.label}</span>
                         </div>
