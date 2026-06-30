@@ -204,7 +204,7 @@ export default function AdminAppointments() {
       <div className="bg-white border border-slate-100 rounded-3xl shadow-sm p-5">
         <div className="flex items-center gap-2 mb-4">
           <SlidersHorizontal size={16} className="text-slate-400" />
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
             Filtros
           </span>
           {hasFilters && (
@@ -221,11 +221,16 @@ export default function AdminAppointments() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Search patient */}
           <div className="relative">
+            <label htmlFor="searchPatient" className="sr-only">
+              Buscar paciente
+            </label>
             <Search
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 pointer-events-none"
             />
             <input
+              id="searchPatient"
+              name="searchPatient"
               type="text"
               placeholder="Buscar paciente..."
               value={searchPatient}
@@ -236,11 +241,16 @@ export default function AdminAppointments() {
 
           {/* Filter by doctor */}
           <div className="relative">
+            <label htmlFor="filterDoctor" className="sr-only">
+              Filtrar por doctor
+            </label>
             <Stethoscope
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 pointer-events-none"
             />
             <select
+              id="filterDoctor"
+              name="filterDoctor"
               value={filterDoctor}
               onChange={(e) => setFilterDoctor(e.target.value)}
               className="w-full pl-9 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition appearance-none cursor-pointer"
@@ -256,11 +266,16 @@ export default function AdminAppointments() {
 
           {/* Filter by specialty */}
           <div className="relative">
+            <label htmlFor="filterSpecialty" className="sr-only">
+              Filtrar por especialidad
+            </label>
             <Calendar
               size={15}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-700 pointer-events-none"
             />
             <select
+              id="filterSpecialty"
+              name="filterSpecialty"
               value={filterSpecialty}
               onChange={(e) => setFilterSpecialty(e.target.value)}
               className="w-full pl-9 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition appearance-none cursor-pointer"
@@ -275,7 +290,12 @@ export default function AdminAppointments() {
           </div>
 
           {/* Filter by status */}
+          <label htmlFor="filterStatus" className="sr-only">
+            Filtrar por estado de cita
+          </label>
           <select
+            id="filterStatus"
+            name="filterStatus"   
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
             className="w-full px-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition appearance-none cursor-pointer"
@@ -316,11 +336,11 @@ export default function AdminAppointments() {
               <table className="w-full text-left">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Paciente</th>
-                    <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Médico</th>
-                    <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Especialidad</th>
-                    <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">Fecha y Hora</th>
-                    <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 text-right">Estado</th>
+                    <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-600">Paciente</th>
+                    <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-600">Médico</th>
+                    <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-600">Especialidad</th>
+                    <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-600">Fecha y Hora</th>
+                    <th className="px-6 py-4 text-[10px] font-bold uppercase tracking-widest text-slate-600 text-right">Estado</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
