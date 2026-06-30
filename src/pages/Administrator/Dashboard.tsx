@@ -125,7 +125,7 @@ export default function AdministratorDashboard() {
       <div className="flex h-[60vh] justify-center items-center">
         <div className="text-center">
           <Loader2 className="animate-spin h-10 w-10 text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-500 font-medium">Cargando panel de control...</p>
+          <p className="text-gray-700 font-medium">Cargando panel de control...</p>
         </div>
       </div>
     )
@@ -137,7 +137,7 @@ export default function AdministratorDashboard() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Dashboard Administrativo</h1>
-        <p className="text-slate-500 font-medium text-sm">Resumen en tiempo real del sistema AuraHealth.</p>
+        <p className="text-slate-700 font-medium text-sm">Resumen en tiempo real del sistema AuraHealth.</p>
       </div>
 
       {error && (
@@ -155,7 +155,7 @@ export default function AdministratorDashboard() {
             <Stethoscope size={24} />
           </div>
           <div>
-            <h3 className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">Total Doctores</h3>
+            <p className="text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-wider">Total Doctores</p>
             <p className="text-3xl font-black text-slate-800 dark:text-white mt-1">{stats.doctors}</p>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function AdministratorDashboard() {
             <Users size={24} />
           </div>
           <div>
-            <h3 className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">Pacientes</h3>
+            <p className="text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-wider">Pacientes</p>
             <p className="text-3xl font-black text-slate-800 dark:text-white mt-1">{stats.patients}</p>
           </div>
         </div>
@@ -177,7 +177,7 @@ export default function AdministratorDashboard() {
             <Calendar size={24} />
           </div>
           <div>
-            <h3 className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">Citas Hoy</h3>
+            <p className="text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-wider">Citas Hoy</p>
             <p className="text-3xl font-black text-slate-800 dark:text-white mt-1">{stats.appointmentsToday}</p>
           </div>
         </div>
@@ -188,7 +188,7 @@ export default function AdministratorDashboard() {
             <MessageSquare size={24} />
           </div>
           <div>
-            <h3 className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">Reportes/Feedback</h3>
+            <p className="text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-wider">Reportes/Feedback</p>
             <p className="text-3xl font-black text-slate-800 dark:text-white mt-1">{stats.feedback}</p>
           </div>
         </div>
@@ -206,22 +206,23 @@ export default function AdministratorDashboard() {
             <h2 className="text-xl font-bold text-slate-800 dark:text-white">Últimas Citas Agendadas</h2>
           </div>
           <button
+            type="button"
             onClick={fetchDashboardData}
-            className="text-xs text-blue-600 hover:text-blue-700 font-bold uppercase tracking-wider"
+            className="text-xs text-blue-800 hover:text-blue-900 dark:text-blue-300 dark:hover:text-blue-200 font-bold uppercase tracking-wider"
           >
             Actualizar
           </button>
         </div>
 
         {recentAppointments.length === 0 ? (
-          <div className="text-center py-12 text-slate-400 dark:text-slate-500 font-medium">
+          <div className="text-center py-12 text-slate-700 dark:text-slate-200 font-medium">
             No se han registrado citas recientemente.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
-                <tr className="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase tracking-widest border-b border-slate-50 dark:border-slate-700 pb-3">
+                <tr className="text-slate-700 dark:text-slate-200 text-[10px] font-bold uppercase tracking-widest border-b border-slate-200 dark:border-slate-700 pb-3">
                   <th className="pb-3">Paciente</th>
                   <th className="pb-3">Médico</th>
                   <th className="pb-3">Fecha y Hora</th>
@@ -237,7 +238,7 @@ export default function AdministratorDashboard() {
                     <td className="py-4 font-semibold">
                       {apt.doctores ? `Dr. ${apt.doctores.nombre} ${apt.doctores.apellido}` : 'Médico General'}
                     </td>
-                    <td className="py-4 font-medium text-slate-500 dark:text-slate-400">
+                    <td className="py-4 font-medium text-slate-700 dark:text-slate-200">
                       {parseNaiveDateTime(apt.fecha_hora).toLocaleDateString('es-ES', {
                         day: 'numeric',
                         month: 'short',
