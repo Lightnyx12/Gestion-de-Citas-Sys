@@ -207,10 +207,11 @@ const closeModal = () => {
 
               {/* SPECIALTY */}
               <div className="mb-5">
-                <label className="block text-sm font-bold text-gray-600 mb-2">
+                <label htmlFor="specialtySelect" className="block text-sm font-bold text-gray-600 mb-2">
                   Especialidad
                 </label>
                 <select
+                  id="specialtySelect"
                   className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all text-gray-700 font-medium"
                   value={selectedSpecialty}
                   onChange={(e) => setSelectedSpecialty(e.target.value)}
@@ -226,10 +227,11 @@ const closeModal = () => {
 
               {/* DATE */}
               <div className="mb-2">
-                <label className="block text-sm font-bold text-gray-600 mb-2">
+                <label htmlFor="appointmentDate" className="block text-sm font-bold text-gray-600 mb-2">
                   Fecha de Cita
                 </label>
                 <input
+                  id="appointmentDate"
                   type="date"
                   className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all text-gray-700 font-medium"
                   value={selectedDate}
