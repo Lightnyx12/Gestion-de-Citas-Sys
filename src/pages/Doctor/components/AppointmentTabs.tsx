@@ -17,9 +17,10 @@ const AppointmentTabs = ({
   completedCount,
 }: AppointmentTabsProps) => {
   const tabClass = (tab: TabType) =>
-    `pb-3 px-4 text-sm font-bold border-b-2 transition-all relative shrink-0 cursor-pointer ${activeTab === tab
+      `pb-3 px-4 text-sm font-bold border-b-2 transition-all relative shrink-0 cursor-pointer ${
+        activeTab === tab
       ? "border-blue-900 text-blue-900 font-extrabold"
-      : "border-transparent text-gray-400 hover:text-gray-600"
+      : "border-transparent text-gray-700 hover:text-blue-900"
     }`;
 
   return (
@@ -72,9 +73,9 @@ interface EmptySelectionProps {
 }
 
 export const EmptySelection = ({ activeTab }: EmptySelectionProps) => (
-  <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-gray-200 flex flex-col items-center justify-center">
-    <Calendar className="w-12 h-12 text-gray-300 mb-3" />
-    <p className="text-gray-500 font-medium">
+  <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-gray-300 flex flex-col items-center justify-center">
+    <Calendar className="w-12 h-12 text-gray-700 mb-3" />
+    <p className="text-gray-700 font-semibold">
       {activeTab === "today"
         ? "No hay citas registradas para hoy."
         : activeTab === "upcoming"

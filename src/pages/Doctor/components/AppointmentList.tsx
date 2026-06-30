@@ -21,13 +21,13 @@ const AppointmentList = ({
 }: AppointmentListProps) => {
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-bold text-slate-800">
+      <h2 className="text-lg font-bold text-slate-800">
         {activeTab === "today"
           ? "Citas de Hoy"
           : activeTab === "upcoming"
             ? "Próximas Citas"
             : "Historial de Citas Atendidas"}
-      </h3>
+      </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {appointments.map((appt) => (
@@ -49,7 +49,7 @@ const AppointmentList = ({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User className="w-5 h-5 text-gray-400" />
+                  <User className="w-5 h-5 text-gray-700" />
                 )}
               </div>
 
@@ -57,7 +57,7 @@ const AppointmentList = ({
                 <h4 className="text-sm font-bold text-gray-800 leading-snug group-hover:text-blue-900 transition-colors">
                   {appt.pacientes?.usuarios?.full_name}
                 </h4>
-                <div className="flex items-center gap-1 text-[11px] font-semibold text-gray-400 mt-1">
+                <div className="flex items-center gap-1 text-[11px] font-semibold text-gray-700 mt-1">
                   <Clock className="w-3.5 h-3.5 text-blue-900/50" />
                   <span>
                     {getLocalDateStr(appt.fecha_hora) !== todayStr
@@ -82,7 +82,7 @@ const AppointmentList = ({
               </div>
             </div>
 
-            <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-blue-900 transition-colors" />
+            <ChevronRight className="w-4 h-4 text-gray-700 group-hover:text-blue-900 transition-colors" />
           </div>
         ))}
 
@@ -101,9 +101,9 @@ const AppointmentList = ({
         {/* Card "Nada más por hoy" siempre visible en tab hoy */}
         {activeTab === "today" && (
           <div className="bg-gray-50/50 rounded-2xl p-5 border border-dashed border-gray-200 flex flex-col items-center justify-center text-center">
-            <Calendar className="w-8 h-8 text-gray-300 mb-2" />
-            <h4 className="text-xs font-bold text-gray-700">Nada más por hoy</h4>
-            <p className="text-[10px] text-gray-400 font-medium mt-0.5">
+            <Calendar className="w-8 h-8 text-gray-700 mb-2" />
+            <p className="text-xs font-bold text-gray-700">Nada más por hoy</p>
+            <p className="text-[10px] text-gray-700 font-medium mt-0.5">
               {tomorrowCount > 0
                 ? `Mañana hay ${tomorrowCount} citas más.`
                 : "No hay citas para mañana."}
