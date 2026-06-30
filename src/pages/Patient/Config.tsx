@@ -313,10 +313,11 @@ const handleChangePassword = async (e: React.FormEvent) => {
               <div className="space-y-4">
                 {/* Nombre */}
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  <label htmlFor="fullName" className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                     Nombre Completo
                   </label>
                   <input
+                    id="fullName"
                     type="text"
                     className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all text-gray-700 font-medium text-sm"
                     value={profile.full_name || ""}
@@ -339,10 +340,11 @@ const handleChangePassword = async (e: React.FormEvent) => {
 
                 {/* Email (Disabled) */}
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  <label htmlFor="patientEmail" className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                     Correo Electrónico
                   </label>
                   <input
+                    id="patientEmail"
                     type="email"
                     className="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-400 cursor-not-allowed font-medium text-sm"
                     value={profile.email || ""}
@@ -352,10 +354,11 @@ const handleChangePassword = async (e: React.FormEvent) => {
 
                 {/* DNI */}
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  <label htmlFor="dni" className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                     DNI / Documento
                   </label>
                   <input
+                    id="dni"
                     type="text"
                     className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all text-gray-700 font-medium text-sm"
                     value={profile.dni || ""}
@@ -375,10 +378,11 @@ const handleChangePassword = async (e: React.FormEvent) => {
 
                 {/* Fecha Nacimiento */}
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  <label htmlFor="birthDate" className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                     Fecha de Nacimiento
                   </label>
                   <input
+                    id="birthDate"
                     type="date"
                     className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all text-gray-700 font-medium text-sm"
                     value={profile.fecha_nac || ""}
@@ -393,10 +397,11 @@ const handleChangePassword = async (e: React.FormEvent) => {
 
                 {/* Dirección */}
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  <label htmlFor="address" className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                     Dirección
                   </label>
                   <input
+                    id="address"
                     type="text"
                     className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all text-gray-700 font-medium text-sm"
                     value={profile.direccion || ""}
@@ -412,10 +417,11 @@ const handleChangePassword = async (e: React.FormEvent) => {
 
                 {/* Alergias */}
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
+                  <label htmlFor="allergies" className="block text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
                     Alergias Conocidas
                   </label>
                   <input
+                    id="allergies"
                     type="text"
                     className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all text-gray-700 font-medium text-sm"
                     value={profile.alergias || ""}
@@ -462,11 +468,13 @@ const handleChangePassword = async (e: React.FormEvent) => {
                     <Calendar className="w-5 h-5" />
                   </div>
 
-                  <label className="relative inline-flex items-center cursor-pointer group">
+                  <label htmlFor="notifCalendario" className="relative inline-flex items-center cursor-pointer group">
                     <input
                       type="checkbox"
                       className="sr-only peer"
+                      id="notifCalendario"
                       checked={notifCalendario}
+                      aria-label="Activar descarga de calendario para citas"
                       onChange={(e) => setNotifCalendario(e.target.checked)}
                     />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
@@ -492,10 +500,12 @@ const handleChangePassword = async (e: React.FormEvent) => {
                     <Mail className="w-5 h-5" />
                   </div>
 
-                  <label className="relative inline-flex items-center cursor-pointer group">
+                  <label htmlFor="notifEmail" className="relative inline-flex items-center cursor-pointer group">
                     <input
                       type="checkbox"
                       className="sr-only peer"
+                      id="notifEmail"
+                      aria-label="Activar recordatorios por correo electrónico"
                       checked={notifEmail}
                       onChange={(e) => setNotifEmail(e.target.checked)}
                     />
