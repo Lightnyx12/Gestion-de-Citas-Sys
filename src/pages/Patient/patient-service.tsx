@@ -15,6 +15,20 @@ export interface PatientProfile {
 }
 
 /* =========================================
+   TIPOS DE PREFERENCIAS DE NOTIFICACIÓN
+========================================= */
+export type NotifFrecuencia = '24h' | '48h'
+
+export interface NotificationPrefs {
+  /** Enviar email de confirmación y recordatorios */
+  notif_email: boolean
+  /** Descargar archivo .ics al agendar cita */
+  notif_calendario: boolean
+  /** Cuándo enviar el recordatorio: '24h', '48h', o ambas */
+  notif_frecuencia: NotifFrecuencia[]
+}
+
+/* =========================================
    OBTENER PERFIL
 ========================================= */
 export const getPatientProfile = async () => {
@@ -180,4 +194,73 @@ export const updatePatientPassword = async (
   }
 
   return true;
+};
+
+/* =========================================
+   OBTENER PREFERENCIAS DE NOTIFICACIÓN
+========================================= */
+export const getNotificationPrefs = async (): Promise<NotificationPrefs> => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Usuario no autenticado');
+
+  const { data, error } = await supabase
+    .from('pacientes')
+    .select('notif_email, notif_calendario, notif_frecuencia')
+    .eq('usuario_id', user.id)
+    .single();
+
+  if (error) throw error;
+
+  return {
+    notif_email:      data.notif_email      ?? true,
+    notif_calendario: data.notif_calendario ?? true,
+    notif_frecuencia: (data.notif_frecuencia ?? ['24h']) as NotifFrecuencia[],
+  };
+};
+
+/* =========================================
+   GUARDAR PREFERENCIAS DE NOTIFICACIÓN
+========================================= */
+export const saveNotificationPrefs = async (
+  prefs: NotificationPrefs
+): Promise<void> => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Usuario no autenticado');
+
+  const { error } = await supabase
+    .from('pacientes')
+    .update({
+      notif_email:      prefs.notif_email,
+      notif_calendario: prefs.notif_calendario,
+      notif_frecuencia: prefs.notif_frecuencia,
+    })
+    .eq('usuario_id', user.id);
+
+  if (error) throw error;
+};
+
+/* =========================================
+   OBTENER notif_calendario DE UN PACIENTE
+   (para usar desde appointment-service)
+========================================= */
+export const getCalendarPref = async (): Promise<boolean> => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return false;
+
+  const { data } = await supabase
+    .from('pacientes')
+    .select('notif_calendario')
+    .eq('usuario_id', user.id)
+    .single();
+
+  return data?.notif_calendario ?? false;
 };

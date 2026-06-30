@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { FileTextIcon, History, Pill } from "lucide-react";
+import { FileTextIcon, History } from "lucide-react";
 import { getMedicalHistory } from "../../lib/medical-history-service";
 
 const MedicalHistory = () => {

@@ -16,6 +16,7 @@ import {
   type Notification,
   type NotificationType,
 } from '../../lib/notification-service'
+import { supabase } from '../../lib/supabase'
 
 // ─── Tipos de filtro ──────────────────────────────────────────────────────────
 
@@ -207,7 +208,6 @@ export default function NotificationsCenter() {
       await loadNotifications(docId)
 
       // ─── Realtime: escuchar INSERTs en la tabla notificaciones ─────────────
-      const { supabase } = await import('../../lib/supabase')
 
       subscription = supabase
         .channel(`notifications:${docId}`)
