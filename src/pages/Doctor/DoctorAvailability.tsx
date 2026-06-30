@@ -283,7 +283,7 @@ export default function DoctorAvailability() {
       <div className="flex h-[60vh] justify-center items-center">
         <div className="text-center">
           <Loader2 className="animate-spin h-10 w-10 text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-500 font-medium">Cargando disponibilidad y agenda...</p>
+          <p className="text-gray-700 font-medium">Cargando disponibilidad y agenda...</p>
         </div>
       </div>
     )
@@ -323,7 +323,13 @@ export default function DoctorAvailability() {
                 }`}
               >
                 <div>{shift.label}</div>
-                <div className="text-xs opacity-75 mt-1">{shift.inicio.substring(0, 5)} - {shift.fin.substring(0, 5)}</div>
+                <div
+                  className={`text-xs mt-1 font-semibold ${
+                  selectedShift === key ? "text-white" : "text-slate-700"
+                  }`}
+                >
+                {shift.inicio.substring(0, 5)} - {shift.fin.substring(0, 5)}
+                </div>
               </button>
             ))}
           </div>
@@ -373,8 +379,10 @@ export default function DoctorAvailability() {
           <form onSubmit={handleAddBlock} className="space-y-4 mb-6">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Inicio</label>
+                <label htmlFor="blockStartDate" className="block text-xs font-bold text-slate-700 uppercase mb-1">Inicio</label>
                 <input
+                  id="blockStartDate"
+                  name="blockStartDate"
                   type="date"
                   required
                   value={blockStart}
@@ -383,8 +391,10 @@ export default function DoctorAvailability() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-400 uppercase mb-1">Fin</label>
+                <label htmlFor="blockEndDate" className="block text-xs font-bold text-slate-700 uppercase mb-1">Fin</label>
                 <input
+                  id="blockEndDate"
+                  name="blockEndDate"
                   type="date"
                   required
                   value={blockEnd}
@@ -417,7 +427,7 @@ export default function DoctorAvailability() {
                   <div key={b.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
                     <div className="min-w-0">
                       <p className="text-sm font-bold text-slate-700">{b.descripcion}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">
+                      <p className="text-xs text-slate-700 mt-0.5 font-medium">
                         {new Date(b.fecha_inicio + 'T00:00:00').toLocaleDateString('es-ES')} - {new Date(b.fecha_fin + 'T00:00:00').toLocaleDateString('es-ES')}
                       </p>
                     </div>
