@@ -5,7 +5,7 @@ import { User } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 // ✅ Importa la imagen correctamente en lugar de usar ruta hardcodeada
-import sidebarImage from '../assets/sidebar_12.png'
+import sidebarImage from '../assets/sidebar_12.webp'
 
 export default function Login() {
   const [email, setEmail] = useState('')
