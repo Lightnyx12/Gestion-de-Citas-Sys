@@ -241,11 +241,13 @@ export default function AdminDoctorManager() {
                 <form onSubmit={handleRegister} className="space-y-5">
                   {/* Nombre completo */}
                   <div className="group">
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-900 mb-2 uppercase tracking-widest">
+                    <label htmlFor="fullName" className="block text-xs font-semibold text-slate-700 dark:text-slate-900 mb-2 uppercase tracking-widest">
                       Nombre Completo
                     </label>
                     <input
                       type="text"
+                      id="fullName"
+                      name="fullName"
                       value={formData.fullName}
                       autoComplete="off"
                       onChange={(e) => handleInputChange('fullName', e.target.value)}
@@ -264,11 +266,13 @@ export default function AdminDoctorManager() {
 
                   {/* DNI */}
                   <div className="group">
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-900 mb-2 uppercase tracking-widest">
+                    <label htmlFor="dni" className="block text-xs font-semibold text-slate-700 dark:text-slate-900 mb-2 uppercase tracking-widest">
                       DNI/Cédula
                     </label>
                     <input
                       type="text"
+                      id="dni"
+                      name="dni"
                       maxLength={8}
                       inputMode="numeric"
                       value={formData.dni}
@@ -286,11 +290,13 @@ export default function AdminDoctorManager() {
 
                   {/* Teléfono */}
                   <div className="group">
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-900 mb-2 uppercase tracking-widest">
+                    <label htmlFor="telefono" className="block text-xs font-semibold text-slate-700 dark:text-slate-900 mb-2 uppercase tracking-widest">
                       Teléfono
                     </label>
                     <input
                       type="tel"
+                      id="telefono"
+                      name="telefono"
                       maxLength={9}
                       inputMode="numeric"
                       value={formData.telefono}
@@ -308,10 +314,12 @@ export default function AdminDoctorManager() {
 
                   {/* Especialidad */}
                   <div className="group">
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-900 mb-2 uppercase tracking-widest">
+                    <label htmlFor="doctorSpecialty" className="block text-xs font-semibold text-slate-700 dark:text-slate-900 mb-2 uppercase tracking-widest">
                       Especialidad
                     </label>
                     <select
+                      id="doctorSpecialty"
+                      name="doctorSpecialty"
                       value={formData.especialidad_id}
                       onChange={(e) => handleInputChange('especialidad_id', e.target.value)}
                       onFocus={() => setFocusedField('especialidad')}
@@ -337,10 +345,12 @@ export default function AdminDoctorManager() {
 
                   {/* Bio */}
                   <div className="group">
-                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-900 mb-2 uppercase tracking-widest">
+                    <label htmlFor="bio" className="block text-xs font-semibold text-slate-700 dark:text-slate-900 mb-2 uppercase tracking-widest">
                       Biografía (Opcional)
                     </label>
                     <textarea
+                      id="bio"
+                      name="bio"
                       value={formData.bio}
                       onChange={(e) => handleInputChange('bio', e.target.value)}
                       onFocus={() => setFocusedField('bio')}
