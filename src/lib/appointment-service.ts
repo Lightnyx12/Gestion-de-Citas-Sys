@@ -1,4 +1,6 @@
 import { supabase } from "./supabase";
+import { createAndDownloadICS } from "./ics-generator";
+import { getCalendarPref } from "../pages/Patient/patient-service";
 
 /* =========================================
    HORARIOS FIJOS
@@ -298,6 +300,42 @@ export const createAppointment =
 
     if (error) {
       throw error;
+    }
+
+    /* =========================
+        DESCARGAR .ICS (CALENDARIO)
+        Solo si el paciente tiene activada
+        la preferencia de calendario.
+        Sin sincronización automática.
+    ========================= */
+    try {
+      const wantsCalendar = await getCalendarPref();
+
+      if (wantsCalendar && data) {
+        const { data: doctorData } = await supabase
+          .from("doctores")
+          .select("nombre, apellido")
+          .eq("id", doctorId)
+          .single();
+
+        const doctorName = doctorData
+          ? `Dr. ${doctorData.nombre} ${doctorData.apellido}`
+          : "Doctor";
+
+        const appointmentStart = new Date(`${date}T${time}:00`);
+
+        createAndDownloadICS(
+          {
+            title: `Cita médica con ${doctorName}`,
+            start: appointmentStart,
+            description: `Cita agendada a través de AuraHealth.\nDoctor: ${doctorName}`,
+            location: "AuraHealth — Clínica",
+          },
+          `cita-${date}`
+        );
+      }
+    } catch {
+      console.warn("No se pudo generar el archivo .ics");
     }
 
     return data;

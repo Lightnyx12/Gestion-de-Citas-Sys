@@ -1,12 +1,14 @@
 import { useEffect, useState, useRef } from "react";
-import { User, UserPen, Shield, Mail, Calendar, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
-
+import { User, UserPen, Shield, Mail, Calendar, CheckCircle, XCircle, AlertTriangle, Bell } from "lucide-react";
 
 import {
   getPatientProfile,
   updatePatientProfile,
   uploadPatientAvatar,
   updatePatientPassword,
+  getNotificationPrefs,
+  saveNotificationPrefs,
+  type NotifFrecuencia,
 } from "./patient-service";
 
 const Config = () => {
@@ -19,6 +21,11 @@ const Config = () => {
     email: "",
     full_name: "",
   });
+
+  // ── Preferencias de notificación ────────────────────────────────────────
+  const [notifEmail, setNotifEmail] = useState(true);
+  const [notifCalendario, setNotifCalendario] = useState(true);
+  const [notifFrecuencia, setNotifFrecuencia] = useState<NotifFrecuencia[]>(["24h"]);
 
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -70,13 +77,30 @@ const closeModal = () => {
   const loadProfile = async () => {
     try {
       setLoading(true);
-      const data = await getPatientProfile();
+      const [data, prefs] = await Promise.all([
+        getPatientProfile(),
+        getNotificationPrefs(),
+      ]);
       setProfile(data);
+      setNotifEmail(prefs.notif_email);
+      setNotifCalendario(prefs.notif_calendario);
+      setNotifFrecuencia(prefs.notif_frecuencia);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // ── Toggle frecuencia ──────────────────────────────────────────────────
+  const toggleFrecuencia = (val: NotifFrecuencia) => {
+    setNotifFrecuencia((prev) => {
+      if (prev.includes(val)) {
+        // Al menos una debe quedar seleccionada
+        return prev.length > 1 ? prev.filter((f) => f !== val) : prev;
+      }
+      return [...prev, val];
+    });
   };
 
   /* =====================================
@@ -142,12 +166,19 @@ const closeModal = () => {
   try {
     setLoading(true);
 
-    await updatePatientProfile(profile);
+    await Promise.all([
+      updatePatientProfile(profile),
+      saveNotificationPrefs({
+        notif_email: notifEmail,
+        notif_calendario: notifCalendario,
+        notif_frecuencia: notifFrecuencia,
+      }),
+    ]);
 
     openModal(
       "success",
-      "Perfil actualizado",
-      "Los cambios fueron guardados correctamente."
+      "Cambios guardados",
+      "Tu perfil y preferencias de notificación fueron actualizados correctamente."
     );
   } catch (error) {
     console.error(error);
@@ -155,7 +186,7 @@ const closeModal = () => {
     openModal(
       "error",
       "Error",
-      "No se pudo actualizar el perfil."
+      "No se pudieron guardar los cambios."
     );
   } finally {
     setLoading(false);
@@ -419,68 +450,135 @@ const handleChangePassword = async (e: React.FormEvent) => {
           <div className="lg:col-span-7 flex flex-col gap-6">
             {/* TOP DUAL CARDS */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
               {/* Calendar card */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between gap-4">
+              <div className={`bg-white rounded-2xl p-6 shadow-sm border transition-all duration-200 flex flex-col justify-between gap-4 ${
+                notifCalendario ? "border-purple-200" : "border-gray-100"
+              }`}>
                 <div className="flex justify-between items-center">
-                  <div className="w-11 h-11 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${
+                    notifCalendario ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-400"
+                  }`}>
                     <Calendar className="w-5 h-5" />
                   </div>
 
                   <label className="relative inline-flex items-center cursor-pointer group">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-900"></div>
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={notifCalendario}
+                      onChange={(e) => setNotifCalendario(e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
                   </label>
                 </div>
 
                 <div>
                   <h3 className="text-base font-bold text-gray-800 mb-1">Añadir al Calendario</h3>
                   <p className="text-xs text-gray-400 leading-relaxed">
-                    Sincroniza y guarda automáticamente las citas médicas en tu calendario de preferencia (Google, Outlook, etc.).
+                    Al confirmar una cita, se descarga un archivo <span className="font-semibold text-gray-500">.ics</span> para añadirla a Google Calendar, Outlook o Apple Calendar. Sin sincronización automática.
                   </p>
                 </div>
               </div>
 
               {/* Email card */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col justify-between gap-4">
+              <div className={`bg-white rounded-2xl p-6 shadow-sm border transition-all duration-200 flex flex-col justify-between gap-4 ${
+                notifEmail ? "border-blue-200" : "border-gray-100"
+              }`}>
                 <div className="flex justify-between items-center">
-                  <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-900 flex items-center justify-center">
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors ${
+                    notifEmail ? "bg-blue-50 text-blue-900" : "bg-gray-100 text-gray-400"
+                  }`}>
                     <Mail className="w-5 h-5" />
                   </div>
 
                   <label className="relative inline-flex items-center cursor-pointer group">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={notifEmail}
+                      onChange={(e) => setNotifEmail(e.target.checked)}
+                    />
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-900"></div>
                   </label>
                 </div>
 
                 <div>
-                  <h3 className="text-base font-bold text-gray-800 mb-1">Email Informativo</h3>
+                  <h3 className="text-base font-bold text-gray-800 mb-1">Recordatorios por Email</h3>
                   <p className="text-xs text-gray-400 leading-relaxed">
-                    Recibe recordatorios de cita, recetas y boletines mensuales de salud en tu correo electrónico principal.
+                    Recibe confirmación y recordatorios de tus citas en tu correo electrónico.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* PREFERENCES LIST */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-50">
-                Preferencias de Frecuencia
-              </h2>
-
-              <div className="space-y-6">
-                {/* Reminders time */}
-                <div className="flex justify-between items-center gap-4">
-                  <div className="max-w-[70%]">
-                    <h4 className="text-sm font-bold text-gray-700 mb-1">Recordatorios de Cita</h4>
-                  </div>
-                  <button className="px-4 py-2.5 bg-gray-50 border border-gray-200 hover:border-gray-300 rounded-xl text-xs font-bold text-gray-700 transition-all cursor-pointer">
-                    24 horas antes
-                  </button>
+            {/* PREFERENCES — FRECUENCIA */}
+            <div className={`bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all duration-300 overflow-hidden ${
+              notifEmail ? "opacity-100 max-h-[300px]" : "opacity-40 max-h-[300px] pointer-events-none"
+            }`}>
+              <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-50">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-900 flex items-center justify-center">
+                  <Bell className="w-4 h-4" />
                 </div>
+                <h2 className="text-base font-bold text-gray-800">
+                  Frecuencia de Recordatorios
+                </h2>
+                {!notifEmail && (
+                  <span className="ml-auto text-[11px] font-semibold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                    Activa el email primero
+                  </span>
+                )}
               </div>
-                    
 
+              <p className="text-xs text-gray-400 mb-4">
+                Selecciona con cuánta anticipación quieres recibir el recordatorio. Puedes elegir ambas opciones.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                {/* 24h */}
+                <button
+                  type="button"
+                  onClick={() => toggleFrecuencia("24h")}
+                  className={`flex-1 flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 text-sm font-bold transition-all duration-150 ${
+                    notifFrecuencia.includes("24h")
+                      ? "border-blue-900 bg-blue-900/5 text-blue-900"
+                      : "border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300"
+                  }`}
+                >
+                  <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
+                    notifFrecuencia.includes("24h")
+                      ? "border-blue-900 bg-blue-900"
+                      : "border-gray-300 bg-white"
+                  }`}>
+                    {notifFrecuencia.includes("24h") && (
+                      <CheckCircle className="w-3 h-3 text-white" />
+                    )}
+                  </span>
+                  24 horas antes
+                </button>
+
+                {/* 48h */}
+                <button
+                  type="button"
+                  onClick={() => toggleFrecuencia("48h")}
+                  className={`flex-1 flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 text-sm font-bold transition-all duration-150 ${
+                    notifFrecuencia.includes("48h")
+                      ? "border-blue-900 bg-blue-900/5 text-blue-900"
+                      : "border-gray-200 bg-gray-50 text-gray-500 hover:border-gray-300"
+                  }`}
+                >
+                  <span className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
+                    notifFrecuencia.includes("48h")
+                      ? "border-blue-900 bg-blue-900"
+                      : "border-gray-300 bg-white"
+                  }`}>
+                    {notifFrecuencia.includes("48h") && (
+                      <CheckCircle className="w-3 h-3 text-white" />
+                    )}
+                  </span>
+                  48 horas antes
+                </button>
+              </div>
             </div>
             
             <div className="bg-blue-50/50 border border-blue-100 rounded-2xl p-5 flex items-start gap-4">
