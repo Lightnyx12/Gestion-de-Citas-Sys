@@ -355,11 +355,12 @@ const DoctorProfileEdit = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-650 mb-2">
+                  <label htmlFor="doctorFullName" className="block text-sm font-semibold text-gray-650 mb-2">
                     Nombre Completo
                   </label>
                   <input
                     type="text"
+                    id="doctorFullName"
                     className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all text-gray-700 font-medium text-sm"
                     value={profile.fullName}
                     onChange={(e) => {
@@ -379,13 +380,15 @@ const DoctorProfileEdit = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-650 mb-2">
+                  <label htmlFor="doctorSpecialty" className="block text-sm font-semibold text-gray-650 mb-2">
                     Especialidad
                   </label>
 
                   <div className="relative">
                     <select
                       className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all text-gray-700 font-medium text-sm appearance-none"
+                      id="doctorSpecialty"
+                      name="doctorSpecialty"
                       value={profile.especialidad_id}
                       onChange={(e) =>
                         setProfile({
@@ -411,11 +414,13 @@ const DoctorProfileEdit = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-650 mb-2">
+                <label htmlFor="doctorBio" className="block text-sm font-semibold text-gray-650 mb-2">
                   Biografía Profesional
                 </label>
 
                 <textarea
+                  id="doctorBio"
+                  name="doctorBio"
                   rows={4}
                   className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all text-gray-700 font-medium text-sm resize-none mb-2"
                   placeholder="Cuéntanos acerca de tu formación, enfoque médico y trayectoria..."
@@ -447,13 +452,14 @@ const DoctorProfileEdit = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-650 mb-2">
+                  <label htmlFor="doctorEmail" className="block text-sm font-semibold text-gray-650 mb-2">
                     Correo Electrónico
                   </label>
 
                   <div className="relative">
                     <input
                       type="email"
+                      id="doctorEmail"
                       className="w-full pl-11 pr-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-400 cursor-not-allowed font-medium text-sm"
                       value={profile.email}
                       disabled
@@ -464,13 +470,14 @@ const DoctorProfileEdit = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-650 mb-2">
+                  <label htmlFor="doctorPhone" className="block text-sm font-semibold text-gray-650 mb-2">
                     Teléfono de Contacto
                   </label>
 
                   <div className="relative">
                     <input
                       type="tel"
+                      id="doctorPhone"
                       inputMode="numeric"
                       className="w-full pl-11 pr-4 py-3 bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all text-gray-700 font-medium text-sm"
                       placeholder="Ej. 987654321"
@@ -491,13 +498,14 @@ const DoctorProfileEdit = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-655 mb-2">
+                <label htmlFor="doctorAddress" className="block text-sm font-semibold text-gray-655 mb-2">
                   Dirección de Consultorio
                 </label>
 
                 <div className="relative">
                   <input
                     type="text"
+                    id="doctorAddress"
                     className="w-full pl-11 pr-4 py-3 bg-gray-50 hover:bg-gray-100/50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-900/10 focus:border-blue-900 transition-all text-gray-700 font-medium text-sm"
                     placeholder="Ej. Av. San Martín 450"
                     value={profile.direccion}
@@ -582,11 +590,13 @@ const DoctorProfileEdit = () => {
             <form onSubmit={handleChangePassword}>
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
+                  <label htmlFor="newPassword" className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
                     Nueva Contraseña
                   </label>
 
                   <input
+                    id="doctorNewPassword"
+                    name="doctorNewPassword"
                     type="password"
                     required
                     minLength={6}
@@ -600,11 +610,13 @@ const DoctorProfileEdit = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
+                  <label htmlFor="confirmPassword" className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
                     Confirmar Contraseña
                   </label>
 
                   <input
+                    id="confirmPassword"
+                    name="confirmPassword"
                     type="password"
                     required
                     minLength={6}
