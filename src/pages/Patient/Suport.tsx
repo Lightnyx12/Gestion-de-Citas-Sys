@@ -5,33 +5,19 @@ import { useState } from "react";
 import {
   Phone,
   MessageCircle,
-  ChevronDown,
   ChevronRight,
   Copy,
 } from "lucide-react";
 
 import { sendAnonymousFeedback } from "../../lib/support-service";
 
-const questions = [
-  {
-    question: "¿Cómo cancelar una cita médica?",
-    answer: "Puedes cancelar tu cita ingresando a la sección 'Mis Citas', localizando la cita correspondiente en tus próximas citas y haciendo clic en 'Cancelar'. Es recomendable realizar la cancelación con al menos 24 horas de antelación para permitir que otros pacientes tomen el horario libre.",
-  },
-  {
-    question: "¿Dónde descargar mis resultados?",
-    answer: "Tus diagnósticos, indicaciones y recetas están guardados en tu 'Historia Clínica Digital'. Si posees un documento de análisis adjunto en formato PDF, aparecerá un botón que te permitirá descargarlo de forma directa.",
-  },
-  {
-    question: "¿Cómo cambiar mis datos de contacto?",
-    answer: "Dirígete a la sección de 'Ajustes' desde el panel de navegación lateral. Allí podrás editar tu información personal como número telefónico, dirección física, reportar alergias o subir una nueva fotografía de perfil.",
-  },
-];
+
 
 const Suport = () => {
   const [message, setMessage] = useState("");
   const [rating, setRating] = useState(5);
   const [loading, setLoading] = useState(false);
-  const [openQuestion, setOpenQuestion] = useState<number | null>(null);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [modalClosing, setModalClosing] = useState(false);
   const [modalTitle, setModalTitle] = useState("");

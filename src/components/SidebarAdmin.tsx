@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboardIcon, NotebookIcon, List } from "lucide-react";
+import { LayoutDashboardIcon, NotebookIcon, List, ClipboardList } from "lucide-react";
 
 interface NavItem {
   id: string;
@@ -11,7 +11,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   {
     id: "appointment",
-    label: "Appointment",
+    label: "Dashboard",
     icon: LayoutDashboardIcon,
     path: "/admin/dashboard",
   },
@@ -27,7 +27,14 @@ const navItems: NavItem[] = [
     icon: List,
     path: "/admin/AdminDoctors",
   },
+  {
+    id: "appointments",
+    label: "Historial Citas",
+    icon: ClipboardList,
+    path: "/admin/appointments",
+  },
 ];
+
 
 export default function SidebarAdmin() {
   const navigate = useNavigate();
@@ -50,11 +57,10 @@ export default function SidebarAdmin() {
             <button
               key={item.id}
               onClick={() => navigate(item.path)}
-              className={`w-full flex items-center gap-[3px] px-4 py-3 rounded-lg transition ${
-                isActive
+              className={`w-full flex items-center gap-[3px] px-4 py-3 rounded-lg transition ${isActive
                   ? "bg-blue-50 text-blue-600 border-l-4 border-blue-600"
                   : "text-gray-600 hover:bg-gray-50"
-              }`}
+                }`}
             >
               <Icon
                 size={18}

@@ -221,18 +221,6 @@ export const availabilityService = {
       return true
     })
 
-    // Helper para parsear TIME 'HH:MM:SS' o 'HH:MM' a minutos
-    function parseTimeToMinutes(tStr: string): number {
-      const parts = tStr.split(':')
-      return Number(parts[0]) * 60 + Number(parts[1])
-    }
-
-    // Helper para formatear minutos a 'HH:MM'
-    function formatMinutesToTime(mins: number): string {
-      const h = Math.floor(mins / 60)
-      const m = mins % 60
-      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
-    }
 
     return { slots: finalSlots, blocked: false }
   },

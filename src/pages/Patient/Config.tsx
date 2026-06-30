@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { User, UserPen, Shield, Mail, Calendar, Lock, X, CheckCircle, XCircle, AlertTriangle, Info } from "lucide-react";
+import { User, UserPen, Shield, Mail, Calendar, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 
 
 import {

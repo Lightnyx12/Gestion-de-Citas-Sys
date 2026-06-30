@@ -66,7 +66,7 @@ const HistoryModal = ({ isOpen, loading, history, onClose }: HistoryModalProps) 
                     {/* Detalle */}
                     <div className="min-w-0 flex-1">
                       <span
-                        className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider mb-1.5 ${item.tipo === "Consulta"
+                        className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider mb-1.5 ${item.tipo === "consulta"
                             ? "bg-blue-50 text-blue-700 border-blue-100"
                             : "bg-purple-50 text-purple-700 border-purple-100"
                           }`}

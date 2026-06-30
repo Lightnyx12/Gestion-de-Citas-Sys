@@ -137,7 +137,7 @@ const ReprogramModal = ({
       console.error(error);
       openFeedbackModal(
         "Error",
-        error.message || "Ocurrió un error al reprogramar la cita."
+        error instanceof Error ? error.message : "Ocurrió un error al reprogramar la cita."
       );
     } finally {
       setLoading(false);
