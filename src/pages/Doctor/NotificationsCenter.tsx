@@ -130,13 +130,13 @@ function NotificationCard({
           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${cfg.badge}`}>
             {cfg.badgeText}
           </span>
-          <span className="text-xs text-gray-400">{formatRelativeTime(notification.created_at)}</span>
+          <span className="text-xs text-gray-700 font-medium">{formatRelativeTime(notification.created_at)}</span>
         </div>
 
         <p className="text-sm font-semibold text-gray-800 leading-snug mb-0.5">
           {notification.titulo}
         </p>
-        <p className="text-sm text-gray-500 leading-relaxed">
+        <p className="text-sm text-gray-700 leading-relaxed">
           {notification.mensaje}
         </p>
       </div>
@@ -303,7 +303,7 @@ export default function NotificationsCenter() {
               <Bell className="w-8 h-8" />
               Notificaciones
             </h1>
-            <p className="text-gray-500 mt-1">
+            <p className="text-gray-700 mt-1">
               {unreadCount > 0
                 ? `Tienes ${unreadCount} notificación${unreadCount > 1 ? 'es' : ''} sin leer`
                 : 'Estás al día con todas tus notificaciones'
@@ -344,7 +344,7 @@ export default function NotificationsCenter() {
                 {tab.label}
                 {count > 0 && (
                   <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold
-                    ${isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}
+                    ${isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-700'}`}
                   >
                     {count}
                   </span>
@@ -365,12 +365,12 @@ export default function NotificationsCenter() {
           // Estado vacío
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <BellOff className="w-9 h-9 text-gray-300" />
+              <BellOff className="w-9 h-9 text-gray-600" />
             </div>
-            <h3 className="text-lg font-bold text-gray-700 mb-1">
+            <h2 className="text-lg font-bold text-gray-700 mb-1">
               {activeTab === 'unread' ? 'Sin notificaciones pendientes' : 'Sin notificaciones'}
-            </h3>
-            <p className="text-sm text-gray-400 max-w-xs">
+            </h2>
+            <p className="text-sm text-gray-700 max-w-xs font-medium">
               {activeTab === 'unread'
                 ? 'Estás al día. Cuando un paciente agende o modifique una cita, aparecerá aquí.'
                 : 'Aún no hay actividad registrada para esta categoría.'
